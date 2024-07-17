@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "This is the backend for my personal management system!!",
+  "main": "index.js",
+  "scripts": {
+    "dev":"nodemon src/index.js"
+  },
+  "keywords": [
+    "javascript",
+    "node",
+    "express",
+    "mongoDb",
+    "backend"
+  ],
+  "author": "Minal Pariyar",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3"
+  }
+}
