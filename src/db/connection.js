@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 import { DATABASE_NAME } from "../constants.js";
 
- const connectDb = async () => {
+const connectDb = async () => {
   try {
     const response = await mongoose.connect(
       `${process.env.MONGO_DB_URI}/${DATABASE_NAME}`
     );
-    console.log(`MongoDb server connected successfully!! DB:host : ${response.connection.host}:${process.env.PORT}`)
+    console.log(`MongoDb server connected successfully!! DB:host : ${response.connection.host}`);
   } catch (error) {
-    console.log("Internal Server Error", error);
-   process.exit(1)
+    console.error("Internal Server Error", error);
+    process.exit(1);
   }
 };
 
