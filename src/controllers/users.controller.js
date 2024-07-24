@@ -125,4 +125,37 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
   throw new ApiError(401,'Error in decoding token!')
  }})
 
-export { store, login,logOut,refreshAccessToken };
+const updatePassword=asyncHandler(async(req,res)=>{
+  const {oldPassword,newPassword}=req.body
+ const user=await User.findById(req.user>_id)
+ const verifyPassword=await user.isPasswordCorrect(oldPassword)
+ if(!verifyPassword){
+  throw new ApiError(400,"Invalid Password")
+ }
+ user.password=newPassword
+ await user.save({validateBeforeSave:false})
+ res.status(200).json(new ApiResponse(200,{},"Password Changed Successfully!!"))
+
+})
+const getCurrentUser=asyncHandler(async(req,res)=>{
+  return res.status(200).json( new ApiResponse(200,req.user,"Current User retrieved Successfully"))
+})
+const updateAccount=asyncHandler(async(req,res)=>{
+  const {fullName,gender,birthDate,email}=req.body
+  if(!fullName||!gender||!birthDate,email){
+    throw new ApiError("Field value is required")
+  }
+  const user=await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      fullName,
+      gender,
+      birthDate,
+      email
+    }
+  },{new:true}).select("-password")
+  return res.status(200).json(new ApiResponse(200,"User Data Updated Successfully!!"))
+})
+const updateAvatar=asyncHandler(async(req,res)=>{
+
+})
+export { store, login,logOut,refreshAccessToken,getCurrentUser,updateAccount,updatePassword };
