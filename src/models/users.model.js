@@ -11,8 +11,8 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     birthDate: {
-      type: Date,
-      required: true,
+      type: String,
+      required:false,
       index: true,
     },
     gender: {
@@ -49,7 +49,6 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      required: true,
     },
     refreshToken: {
       type: String,

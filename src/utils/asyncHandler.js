@@ -3,8 +3,11 @@ export const asyncHandler=(fn)=>async(req,res,next)=>{
        return await fn(req,res,next)
     }
     catch(err){
-       return  res.status(err.code||500).json({
-            success:false,
-        })
+        console.error(err);
+        const statusCode = (err.code >= 100 && err.code < 600) ? err.code : 500;
+        return res.status(statusCode).json({
+            success: false,
+            message: err.message || 'Internal Server Error',
+        });
     }
 }
