@@ -104,7 +104,7 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
   if(!incomingToken){
     throw new ApiError(401,"Unauthorized Request")
   }
- try {
+ 
    const decodedToken=jwt.verify(incomingToken,process.env.REFRESH_TOKEN_SECRET)
    const user= await User.findById(decodedToken?._id)
    if(!user){
@@ -120,14 +120,12 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
   const {accessToken,newRefreshToken} =await generateAccessAndRefresh(user._id)
    return res.status(200).cookies("accessToken",accessToken,options).cookies("refreshToken",newRefreshToken,options).json(new ApiResponse(200,{accessToken,newRefreshToken},"Access Token refreshed successfully!!"))
  
- 
- } catch (error) {
-  throw new ApiError(401,'Error in decoding token!')
- }})
+  }
+ )
 
 const updatePassword=asyncHandler(async(req,res)=>{
   const {oldPassword,newPassword}=req.body
- const user=await User.findById(req.user>_id)
+ const user=await User.findById(req.user?._id)
  const verifyPassword=await user.isPasswordCorrect(oldPassword)
  if(!verifyPassword){
   throw new ApiError(400,"Invalid Password")
@@ -142,7 +140,7 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
 })
 const updateAccount=asyncHandler(async(req,res)=>{
   const {fullName,gender,birthDate,email}=req.body
-  if(!fullName||!gender||!birthDate,email){
+  if(!fullName||!gender||!birthDate||!email){
     throw new ApiError("Field value is required")
   }
   const user=await User.findByIdAndUpdate(req.user?._id,{
@@ -165,9 +163,10 @@ const updateAvatar=asyncHandler(async(req,res)=>{
  if(!avatar.url){
   throw new ApiError(400,"Error while updating the file")
  }
- await User.findByIdAndUpdate(req.user?._id,{
+const data= await User.findByIdAndUpdate(req.user?._id,{
   $set:{avatar:avatar.url}
  },{new:true}).select("-password")
+ return res.status(200).json(new ApiResponse(200,data,"Avatar updated successfully"))
 })
 
 
