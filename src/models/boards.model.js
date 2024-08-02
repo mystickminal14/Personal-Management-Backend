@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const boardSchema = new mongoose.Schema(
   {
     boardName: {
@@ -6,17 +7,20 @@ const boardSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    background: {
+      type: String,
+    },
     description: {
       type: String,
       required: true,
       trim: true,
     },
     startDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     endDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     status: {
@@ -41,4 +45,5 @@ const boardSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-export const Board= new mongoose.Schema("Board",boardSchema)
+
+export const Board = mongoose.model("Board", boardSchema);

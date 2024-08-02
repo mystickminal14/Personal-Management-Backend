@@ -12,7 +12,7 @@ router.route("/update").post(verifyJWT,updateAccount)
 router.route("/update-password").post(verifyJWT,updatePassword)
 router.route("/update-avatar").post( upload.single('avatar'),verifyJWT,updateAvatar)
 
-//PROTECTED
+//PROTECTEDA
 router.route("/logout").post(verifyJWT,logOut)
 router.route("/refresh-token").post(refreshAccessToken)
 export { router };
