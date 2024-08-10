@@ -3,13 +3,14 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { uploadCloud } from "../utils/fileUpload.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 
 const create = asyncHandler(async (req, res) => {
   const { boardName, description, startDate, endDate, background, status } =
     req.body;
 
   if (
-    [boardName, description, startDate, endDate, background, status].some(
+    [boardName, description, startDate, endDate, status].some(
       (field) => field?.trim() === ""
     )
   ) {
@@ -27,7 +28,6 @@ const create = asyncHandler(async (req, res) => {
     const backgroundImg = await uploadCloud(backgroundLocalPath);
     backgroundUrl = backgroundImg?.url || "";
   }
-
 
   const board = await Board.create({
     boardName,
@@ -50,7 +50,9 @@ const retrieve = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid Access Token");
   }
 
-  const boards = await Board.find({ createdBy: userId });
+  const boards = await Board.find({
+    $and: [{ createdBy: userId }, { isDeleted: false }],
+  });
   if (!boards) {
     throw new ApiError(400, "No Records found!!");
   }
@@ -60,21 +62,38 @@ const retrieve = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, boards, "Data Retrieved Successfully!!"));
 });
 
-const singleView = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    throw new ApiError(400, "Board ID is required");
+const getLatestBoard = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(401, "Invalid Access Token");
   }
 
-  const data = await Board.findById(id);
-  if (!data) {
-    throw new ApiError(400, `Board does not exist!!`);
-  }
+  const latestBoard = await Board.findOne({
+    $and: [{ createdBy: userId }, { status: "Active" }, { isDeleted: false }],
+  })
+    .sort({ createdAt: -1 })
+    .exec();
 
   return res
     .status(200)
-    .json(new ApiResponse(200, data, "Board Retrieved Successfully!!"));
+    .json(
+      new ApiResponse(200, latestBoard, "Latest Board Retrieved Successfully")
+    );
 });
+
+const view = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(401, "Invalid Board Id");
+  }
+
+  const latestBoard = await Board.find({ _id: id });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, latestBoard, " Board Retrieved Successfully"));
+});
+
 const drop = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -94,24 +113,29 @@ const update = asyncHandler(async (req, res) => {
   if (!id) {
     throw new ApiError(400, "Board ID is required");
   }
-  const { boardName, description, startDate, endDate, background, status } =
-    req.body;
 
-  if (
-    [boardName, description, startDate, endDate, background, status].some(
-      (field) => field?.trim() === ""
-    )
-  ) {
+  const { boardName, description, startDate, endDate, status } = req.body;
+
+  if ([boardName, description, startDate, endDate, status].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required!!");
   }
+
   const updatedData = await Board.findByIdAndUpdate(
-    { _id: id },
-    { $set: { boardName, description, startDate, endDate, background, status } }
+    id,  // Pass the ID directly
+    {
+      $set: { boardName, description, startDate, endDate, status },
+    },
+    { new: true }  // Return the updated document
   );
-  return res
-    .status(200)
-    .json(new ApiResponse(200, updatedData, "Board updated successfully!!"));
+
+  
+  if (!updatedData) {
+    throw new ApiError(404, "Board not found");
+  }
+
+  return res.status(200).json(new ApiResponse(200, updatedData, "Board updated successfully!!"));
 });
+
 const updateBackground = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -136,4 +160,28 @@ const updateBackground = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, data, "Background Image updated successfully"));
 });
-export { create, retrieve, singleView, drop, update, updateBackground };
+const deleted = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  if (!userId || !mongoose.isValidObjectId(userId)) {
+    throw new ApiError(401, "Invalid Access Token");
+  }
+
+  const data = await Board.find({
+    $and: [{ createdBy: userId }, { status: "Inactive" }],
+  });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, data, "BoardData deleted Successfully!!"));
+});
+
+export {
+  create,
+  retrieve,
+  view,
+  drop,
+  deleted,
+  update,
+  updateBackground,
+  getLatestBoard,
+};
