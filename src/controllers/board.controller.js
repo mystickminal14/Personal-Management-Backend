@@ -16,9 +16,11 @@ const create = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(400, "All fields are required!!");
   }
-  if (!taskStatus) {
-    throw new ApiError(400, "Task Status is required");
+ 
+  if (!taskStatus.length) {
+    throw new ApiError(400, "Status is required");
   }
+
   const UserId = req.user?._id;
   if (!UserId) {
     throw new ApiError(401, "Invalid Access Token");

@@ -11,11 +11,11 @@ const store = asyncHandler(async (req, res) => {
     dueDate,
     priority,
     boardId,
-    status = [],
+status
   } = req.body;
 
   if (
-    [title, description, dueDate, priority].some(
+    [title, description, dueDate,status, priority].some(
       (field) => field?.trim() === ""
     )
   ) {
@@ -26,17 +26,13 @@ const store = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Board id is required");
   }
 
-  if (!status.length) {
-    throw new ApiError(400, "Status is required");
-  }
-
   const save = await Task.create({
     title,
     description,
     dueDate,
     priority,
     boardId,
-    status: status.map((statusItem) => ({ status: statusItem })),
+    status,
   });
 
   const data = await Task.findById(save._id).populate("status");
