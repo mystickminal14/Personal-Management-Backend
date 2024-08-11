@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
-
+const statusSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+});
 const boardSchema = new mongoose.Schema(
   {
     boardName: {
@@ -32,6 +38,7 @@ const boardSchema = new mongoose.Schema(
       default: "Active",
       trim: true,
     },
+    taskStatus:[statusSchema],
     isDeleted: {
       type: Boolean,
       default: false,

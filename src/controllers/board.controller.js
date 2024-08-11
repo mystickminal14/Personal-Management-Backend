@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 
 const create = asyncHandler(async (req, res) => {
-  const { boardName, description, startDate, endDate, background, status } =
+  const { boardName, description, startDate, endDate, taskStatus=[], status } =
     req.body;
 
   if (
@@ -16,7 +16,9 @@ const create = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(400, "All fields are required!!");
   }
-
+  if (!taskStatus) {
+    throw new ApiError(400, "Task Status is required");
+  }
   const UserId = req.user?._id;
   if (!UserId) {
     throw new ApiError(401, "Invalid Access Token");
@@ -37,7 +39,9 @@ const create = asyncHandler(async (req, res) => {
     background: backgroundUrl,
     createdBy: UserId,
     status,
+    taskStatus:taskStatus.map((statusItem) => ({ status: statusItem }))
   });
+ 
 
   return res
     .status(200)
@@ -83,6 +87,7 @@ const getLatestBoard = asyncHandler(async (req, res) => {
 
 const view = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   if (!id) {
     throw new ApiError(401, "Invalid Board Id");
   }
@@ -96,6 +101,7 @@ const view = asyncHandler(async (req, res) => {
 
 const drop = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
   if (!id) {
     throw new ApiError(400, "Board ID is required");
   }
@@ -116,24 +122,29 @@ const update = asyncHandler(async (req, res) => {
 
   const { boardName, description, startDate, endDate, status } = req.body;
 
-  if ([boardName, description, startDate, endDate, status].some((field) => field?.trim() === "")) {
+  if (
+    [boardName, description, startDate, endDate, status].some(
+      (field) => field?.trim() === ""
+    )
+  ) {
     throw new ApiError(400, "All fields are required!!");
   }
 
   const updatedData = await Board.findByIdAndUpdate(
-    id,  // Pass the ID directly
+    id, // Pass the ID directly
     {
       $set: { boardName, description, startDate, endDate, status },
     },
-    { new: true }  // Return the updated document
+    { new: true } // Return the updated document
   );
 
-  
   if (!updatedData) {
     throw new ApiError(404, "Board not found");
   }
 
-  return res.status(200).json(new ApiResponse(200, updatedData, "Board updated successfully!!"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedData, "Board updated successfully!!"));
 });
 
 const updateBackground = asyncHandler(async (req, res) => {

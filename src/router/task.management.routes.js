@@ -35,10 +35,10 @@ taskRouter
   .post(verifyJWT, upload.single("background"), create);
 taskRouter.route("/boards").get(verifyJWT, retrieve);
 taskRouter.route("/boards/latest").get(verifyJWT, getLatestBoard);
-taskRouter.route("/boards/:id").get(verifyJWT, view);
 taskRouter.route("/boards/edit/:id").put(verifyJWT, update);
 taskRouter.route("/boards/delete/:id").delete(verifyJWT, drop);
 taskRouter.route("/boards/deleted").get(verifyJWT, deleted);
+taskRouter.route("/boards/:id").get(verifyJWT, view);
 taskRouter
   .route("/boards/update-background/:id")
   .post(upload.single("background"), verifyJWT, updateBackground);
@@ -48,8 +48,8 @@ taskRouter.route("/boards/tasks/create").post(verifyJWT, store);
 taskRouter.route("/boards/tasks/delete/:id").delete(verifyJWT, dropTask);
 taskRouter.route("/boards/tasks/edit/:id").put(verifyJWT, updateTask);
 taskRouter.route("/boards/tasks/view/:id").get(verifyJWT, viewTask);
-taskRouter.route("/boards/tasks/:id").get(verifyJWT, retrieveTask);
 taskRouter.route("/boards/tasks/status/:id").post(verifyJWT, createStatus);
+taskRouter.route("/boards/tasks/:id").get(verifyJWT, retrieveTask);
 taskRouter
   .route("/boards/tasks/status/edit/:id/:statusId")
   .put(verifyJWT, updateStatus);

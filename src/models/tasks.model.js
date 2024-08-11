@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
 
-const statusSchema = new mongoose.Schema({
-  status: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-});
+
 
 const imageSchema = new mongoose.Schema({
   images: {
@@ -23,7 +17,11 @@ const taskSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    status: [statusSchema],
+    status:{
+      type: String,
+      required: true,
+      trim: true,
+    },
     description: {
       type: String,
       required: true,
