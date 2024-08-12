@@ -48,7 +48,7 @@ const updateTask = asyncHandler(async (req, res) => {
     dueDate,
     priority,
     boardId,
-    status = [],
+    status ,
   } = req.body;
 
   if (
@@ -74,7 +74,7 @@ const updateTask = asyncHandler(async (req, res) => {
       dueDate,
       priority,
       boardId,
-      status: status.map((statusItem) => ({ status: statusItem })),
+      status,
     },
     { new: true }
   );
@@ -117,22 +117,7 @@ const dropTask = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Task deleted successfully"));
 });
 
-const createStatus = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { status = [] } = req.body;
-  if (!status.length) {
-    throw new ApiError(400, "Status is required");
-  }
-  const task = await Task.findById(id);
-  if (!task) {
-    throw new ApiError(404, "Task not found");
-  }
-  status.forEach((statusItem) => {
-    task.status.push({ status: statusItem });
-  });
-  await task.save();
-  res.status(200).json(new ApiResponse(200, task, "Status added successfully"));
-});
+
 const updateStatus = asyncHandler(async (req, res) => {
   const { id, statusId } = req.params;
   const { status } = req.body;
@@ -180,7 +165,6 @@ export {
   retrieveTask,
   dropTask,
   updateTask,
-  createStatus,
   updateStatus,
   deleteStatus,
 };

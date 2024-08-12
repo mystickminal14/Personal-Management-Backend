@@ -71,4 +71,16 @@ const editSubTask = asyncHandler(async (req, res) => {
   const updatedData=await Subtask.findByIdAndUpdate({_id:id},{$set:{taskId, title, status, description, dueDate }})
   return res.status(200).json(new ApiResponse(200, updatedData, "Subtask updated successfully!!"));
 });
-export { createSubTask, dropSubTask, editSubTask, viewSubTask,retireveSubTask };
+
+const countData = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "Task ID is required!");
+  }
+
+  const count = await Subtask.countDocuments({ taskId: id });
+
+  return res.status(200).json(new ApiResponse(200, count, "Total subtasks retrieved successfully!"));
+});
+export { createSubTask, dropSubTask, editSubTask, viewSubTask,retireveSubTask ,countData};

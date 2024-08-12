@@ -6,7 +6,8 @@ import {
   view,
   deleted,
   update,
-  updateBackground,getLatestBoard
+
+  updateBackground,getLatestBoard,createStatus
 } from "../controllers/board.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
@@ -16,7 +17,7 @@ import {
   retrieveTask,
   dropTask,
   updateTask,
-  createStatus,
+  
   updateStatus,
   deleteStatus,
 } from "../controllers/tasks.controller.js";
@@ -26,6 +27,7 @@ import {
   editSubTask,
   viewSubTask,
   retireveSubTask,
+  countData,
 } from "../controllers/subtask.controller.js";
 
 const taskRouter = express.Router();
@@ -37,6 +39,7 @@ taskRouter.route("/boards").get(verifyJWT, retrieve);
 taskRouter.route("/boards/latest").get(verifyJWT, getLatestBoard);
 taskRouter.route("/boards/edit/:id").put(verifyJWT, update);
 taskRouter.route("/boards/delete/:id").delete(verifyJWT, drop);
+taskRouter.route("/boards/status/:id").post(verifyJWT, createStatus);
 taskRouter.route("/boards/deleted").get(verifyJWT, deleted);
 taskRouter.route("/boards/:id").get(verifyJWT, view);
 taskRouter
@@ -48,7 +51,6 @@ taskRouter.route("/boards/tasks/create").post(verifyJWT, store);
 taskRouter.route("/boards/tasks/delete/:id").delete(verifyJWT, dropTask);
 taskRouter.route("/boards/tasks/edit/:id").put(verifyJWT, updateTask);
 taskRouter.route("/boards/tasks/view/:id").get(verifyJWT, viewTask);
-taskRouter.route("/boards/tasks/status/:id").post(verifyJWT, createStatus);
 taskRouter.route("/boards/tasks/:id").get(verifyJWT, retrieveTask);
 taskRouter
   .route("/boards/tasks/status/edit/:id/:statusId")
@@ -67,5 +69,6 @@ taskRouter
 taskRouter.route("/boards/tasks/subtasks/edit/:id").put(verifyJWT, editSubTask);
 taskRouter.route("/boards/tasks/subtasks/view/:id").get(verifyJWT, viewSubTask);
 taskRouter.route("/boards/tasks/subtasks/:id").get(verifyJWT, retireveSubTask);
+taskRouter.route("/boards/tasks/subtasks-count/:id").get(verifyJWT, countData);
 
 export { taskRouter };

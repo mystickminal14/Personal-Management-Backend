@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 
 const create = asyncHandler(async (req, res) => {
-  const { boardName, description, startDate, endDate, taskStatus=[], status } =
+  const { boardName, description, startDate, endDate, taskStatus=[], status,background } =
     req.body;
 
   if (
@@ -187,6 +187,27 @@ const deleted = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, data, "BoardData deleted Successfully!!"));
 });
+const createStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status = [] } = req.body;
+  
+  if (!status.length) {
+    throw new ApiError(400, "Status is required");
+  }
+  
+  const board = await Board.findById(id);
+  if (!board) {
+    throw new ApiError(404, "Board not found");
+  }
+  
+  status.forEach((statusItem) => {
+    board.taskStatus.push({ status: statusItem }); // Ensure the field name matches your schema
+  });
+  
+  await board.save(); // Save the board, not task
+
+  return res.status(200).json(new ApiResponse(200, board, "Status added successfully"));
+});
 
 export {
   create,
@@ -197,4 +218,5 @@ export {
   update,
   updateBackground,
   getLatestBoard,
+  createStatus
 };
