@@ -19,7 +19,7 @@ const create = asyncHandler(async (req, res) => {
  
   if (!taskStatus.length) {
     throw new ApiError(400, "Status is required");
-  }
+  }                                                 
 
   const UserId = req.user?._id;
   if (!UserId) {
@@ -57,7 +57,7 @@ const retrieve = asyncHandler(async (req, res) => {
   }
 
   const boards = await Board.find({
-    $and: [{ createdBy: userId }, { isDeleted: false }],
+    $and: [{ createdBy: userId }, { isDeleted: false },{status:"Active"}],
   });
   if (!boards) {
     throw new ApiError(400, "No Records found!!");
